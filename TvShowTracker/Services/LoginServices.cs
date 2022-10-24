@@ -1,0 +1,62 @@
+﻿using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using TvShowTracker.Interfaces;
+using System.Security.Claims;
+using TvShowTracker.Model;
+using TvShowTracker.Data;
+using System.Text;
+namespace TvShowTracker.Services
+{
+    public class LoginServices : ILoginServices
+    {
+        private readonly AppDbContext _context;
+        private readonly IConfiguration _config;
+        public LoginServices(AppDbContext context, IConfiguration config)
+        {
+            _context = context;
+            _config = config;
+        }
+        private string GenerateToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+              _config["Jwt:Audience"],
+              claims,
+              expires: DateTime.Now.AddMinutes(30),
+              signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private User? Autenticate(UserPostDTO userLogin)
+        {
+            var currentUser = _context.Users.FirstOrDefault(u => u.Email == userLogin.Email && u.Password == userLogin.Password);
+            if (currentUser != null)
+            {
+                return currentUser;
+            }
+            return null;
+        }
+        public string Login(UserPostDTO userLogin)
+        {
+            try
+            {
+                var user = Autenticate(userLogin);
+                if (user != null)
+                {
+                    string token = GenerateToken(user);
+                    return token;
+                }
+                return "";
+            }
+            catch
+            {
+                throw;
+            }
+        }
+    }
+}

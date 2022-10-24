@@ -1,0 +1,24 @@
+version: '3.4'
+
+services:
+  tvshowtracker:
+    container_name: tvshowtrackerapi
+    image: ${DOCKER_REGISTRY-}tvshowapp
+    build:
+      context: .
+      dockerfile: .
+    ports:
+     - "8081:80"       
+    depends_on:
+     - sqldata
+
+  sqldata:
+    container_name: sqldata
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=Password123!
+      - ACCEPT_EULA=Y
+    volumes:
+      - c:\dados\volumes\mssql:/var/opt/mssql/data   
+    ports:
+      - "1450:1433"  
