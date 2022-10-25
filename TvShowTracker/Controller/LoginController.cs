@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TvShowTracker.Interfaces;
 using TvShowTracker.Model;
+
 namespace TvShowTracker.Controller
 {
     [Route("v1/[controller]")]
@@ -19,14 +20,14 @@ namespace TvShowTracker.Controller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult Login(UserPostDTO userLogin)
+        public async Task<ActionResult<string>> Login(UserPostDTO userLogin)
         {
             if (userLogin == null) return BadRequest();
             if (string.IsNullOrWhiteSpace(userLogin.Email)) return BadRequest();
             if (string.IsNullOrWhiteSpace(userLogin.Password)) return BadRequest();
             try
             {
-                string token = _login.Login(userLogin);
+                string token = await _login.Login(userLogin);
                 if (!string.IsNullOrEmpty(token))
                     return Ok(token);
                 return

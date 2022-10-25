@@ -10,6 +10,10 @@ using TvShowTracker.Config;
 using TvShowTracker.Data;
 using AutoMapper;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.AspNetCore.Mvc.Authorization;
+
 namespace TvShowTracker.Startup
 {
     public static class DependecyInjection
@@ -66,6 +70,13 @@ namespace TvShowTracker.Startup
                 setup.SwaggerDoc("v1", new OpenApiInfo { Title = "TvShowTracker", Version = "v1" });
                 setup.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
                 setup.OperationFilter<AuthResponsesOperationFilter>();
+            });
+            Services.AddMvc(_ =>
+            {
+                var authPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                _.Filters.Add(new AuthorizeFilter(authPolicy));
             });
             return Services;
         }

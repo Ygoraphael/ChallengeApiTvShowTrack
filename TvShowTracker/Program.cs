@@ -4,12 +4,13 @@ using Hangfire;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.RegisterServices(builder.Configuration);
 var app = builder.Build();
+app.UseHangfireServer();
 app.UseHangfireDashboard();
 if (!app.Environment.IsStaging())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TvShowTracker v1"));
-    RecurringJob.AddOrUpdate<ApiServiceTMDB>("ApiServiceTMDB", (Api) => Api.LoapApi(), Cron.Daily);
+    RecurringJob.AddOrUpdate<ApiServiceTMDB>("ApiServiceTMDB", (Api) => Api.LoapApi(), Cron.Weekly);
 }
 app.UseAuthentication();
 app.UseAuthorization();

@@ -7,15 +7,20 @@ namespace TvShowTracker.Config.LoadDataApi
     public class ApiServiceTMDB : IApiServices
     {
         private string _apiKey;
-        private readonly DapperRepository _dapperRepository;
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
-        List<TvShowGenre> _listTvShowGenres = new List<TvShowGenre>();
-        List<TvShow> _listTvShow = new List<TvShow>();
+        private readonly DapperRepository _dapperRepository;
+        private readonly string _urlGenre;
+        private readonly string _urlTvShow;
+        private readonly string _urlSeason;
+        private readonly string _urlEpsiodeActors;
+
         List<Genre> _listGenre = new List<Genre>();
+        List<Actor> _listActor = new List<Actor>();
+        List<TvShow> _listTvShow = new List<TvShow>();
         List<Season> _listSeason = new List<Season>();
         List<Episode> _listEpisode = new List<Episode>();
-        List<Actor> _listActor = new List<Actor>();
+        List<TvShowGenre> _listTvShowGenres = new List<TvShowGenre>();
         List<EpisodeActor> _listEpisodeActor = new List<EpisodeActor>();
         public ApiServiceTMDB(HttpClient httpClient, IMapper mapper, DapperRepository dapperRepository, IConfiguration config)
         {
@@ -24,6 +29,10 @@ namespace TvShowTracker.Config.LoadDataApi
             _mapper = mapper;
             _dapperRepository = dapperRepository;
             _apiKey = config["ExternalApi:TMDBKey"];
+            _urlGenre = config["ExternalApi:Methods:Genres"];
+            _urlTvShow = config["ExternalApi:Methods:TvShows"];
+            _urlSeason = config["ExternalApi:Methods:Seasons"];
+            _urlEpsiodeActors = config["ExternalApi:Methods:EpisodesActors"];
         }
         public async Task LoapApi()
         {
@@ -44,8 +53,7 @@ namespace TvShowTracker.Config.LoadDataApi
         }
         public async Task GetApiGenres()
         {
-            string _getUrlGenres = "genre/tv/list?api_key={api_key}";
-            string getUrl = _getUrlGenres.Replace("{api_key}", _apiKey);
+            string getUrl = ReplaceApiKeyUrl(_urlGenre);
             try
             {
                 GenresResponseJson GenresApi = await _httpClient.CallApi<GenresResponseJson>(getUrl);
@@ -60,14 +68,19 @@ namespace TvShowTracker.Config.LoadDataApi
                 throw e;
             }
         }
+        public void CleanMemory()
+        {
+            SaveAlllistEntities();
+            ClearAlllistEntities();
+            SaveRelations();
+            ClearAlllistRelations();
+        }
         public async Task GetApiTvShows()
         {
             const int MaxPagesToLoad = 20;
             int PageNumber = 1;
             int TotalPages;
-            string _getUrlTvShows = "trending/tv/day?api_key={api_key}&page={PageNumber}";
-            string getUrlNoPage = _getUrlTvShows.Replace("{api_key}", _apiKey);
-            string getUrl = getUrlNoPage.Replace("{PageNumber}", PageNumber.ToString());
+            string getUrl = GetUrlTvShow(PageNumber);
             do
             {
                 try
@@ -87,11 +100,8 @@ namespace TvShowTracker.Config.LoadDataApi
                     throw e;
                 }
                 PageNumber++;
-                getUrl = getUrlNoPage.Replace("{PageNumber}", PageNumber.ToString());
-                SaveAlllistEntities();
-                ClearAlllistEntities();
-                SaveRelations();
-                ClearAlllistRelations();
+                getUrl = GetUrlTvShow(PageNumber);
+                CleanMemory();
             } while (PageNumber < MaxPagesToLoad && PageNumber < TotalPages);
         }
         private void CreateRelationTvShowGenres(List<int> genreTvShow, int tvShowId)
@@ -108,9 +118,7 @@ namespace TvShowTracker.Config.LoadDataApi
         }
         public async Task GetApiSeason(int tvShowId)
         {
-            string _getUrlSeason = "tv/{tvShowId}?api_key={api_key}";
-            string getUrl = _getUrlSeason.Replace("{api_key}", _apiKey);
-            getUrl = getUrl.Replace("{tvShowId}", tvShowId.ToString());
+            string getUrl = GetUrlSeasons(tvShowId);
             try
             {
                 var SeasonApi = await _httpClient.CallApi<SeasonResponseJson>(getUrl);
@@ -129,10 +137,7 @@ namespace TvShowTracker.Config.LoadDataApi
         }
         public async Task GetApiEpisodesActors(int seasonId, int seasonNumber, int tvShowId)
         {
-            string _getUrlEpisode = "tv/{tvShowId}/season/{SeasonId}?api_key={api_key}";
-            string getUrl = _getUrlEpisode.Replace("{api_key}", _apiKey);
-            getUrl = getUrl.Replace("{tvShowId}", tvShowId.ToString());
-            getUrl = getUrl.Replace("{SeasonId}", seasonNumber.ToString());
+            string getUrl = GetUrlEpisodeActors(seasonNumber, tvShowId);
             try
             {
                 var EpisodeActorApi = await _httpClient.CallApi<EpisodeActorsResponseJson>(getUrl);
@@ -156,6 +161,24 @@ namespace TvShowTracker.Config.LoadDataApi
             {
                 throw e;
             }
+        }
+        public string ReplaceApiKeyUrl(string url)
+        {
+            return url.Replace("{api_key}", _apiKey);             
+        }
+        public string GetUrlTvShow(int PageNumber)
+        {
+            return ReplaceApiKeyUrl(_urlTvShow).Replace("{PageNumber}", PageNumber.ToString());
+        }
+        public string GetUrlSeasons(int tvShowId)
+        {
+            return ReplaceApiKeyUrl(_urlSeason).Replace("{tvShowId}", tvShowId.ToString());
+        }
+        public string GetUrlEpisodeActors(int seasonNumber, int tvShowId)
+        {
+            return ReplaceApiKeyUrl(_urlEpsiodeActors)
+                    .Replace("{tvShowId}", tvShowId.ToString())
+                    .Replace("{SeasonId}", seasonNumber.ToString());
         }
         private void SaveRelations()
         {

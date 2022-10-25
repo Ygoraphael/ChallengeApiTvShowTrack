@@ -5,6 +5,8 @@ using System.Security.Claims;
 using TvShowTracker.Model;
 using TvShowTracker.Data;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+
 namespace TvShowTracker.Services
 {
     public class LoginServices : ILoginServices
@@ -16,7 +18,7 @@ namespace TvShowTracker.Services
             _context = context;
             _config = config;
         }
-        private string GenerateToken(User user)
+        private async Task<string> GenerateToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -32,23 +34,23 @@ namespace TvShowTracker.Services
               signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        private User? Autenticate(UserPostDTO userLogin)
+        private async Task<User> Autenticate(UserPostDTO userLogin)
         {
-            var currentUser = _context.Users.FirstOrDefault(u => u.Email == userLogin.Email && u.Password == userLogin.Password);
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email && u.Password == userLogin.Password);
             if (currentUser != null)
             {
                 return currentUser;
             }
             return null;
         }
-        public string Login(UserPostDTO userLogin)
+        public async Task<string> Login(UserPostDTO userLogin)
         {
             try
             {
-                var user = Autenticate(userLogin);
+                User user = await Autenticate(userLogin);
                 if (user != null)
                 {
-                    string token = GenerateToken(user);
+                    string token = await GenerateToken(user);
                     return token;
                 }
                 return "";

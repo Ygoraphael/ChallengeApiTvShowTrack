@@ -1,5 +1,4 @@
 ﻿using TvShowTracker.EntityFrameworkPaginateCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using TvShowTracker.Interfaces;
 using TvShowTracker.Model;
@@ -73,28 +72,18 @@ namespace TvShowTracker.Services
                 throw;
             }
         }
-        public async Task<Page<ICollection<Episode>>> GetEpisodesTvShow(int id, int skip, int take, string sort)
+        public async Task<Page<Episode>> GetEpisodesTvShow(int id, int skip, int take, string sort)
         {
             try
             {
-
-                int count = await _context.Seasons.AsNoTracking()
-                                        .Include(s => s.Episodes)
-                                        .Where(e => e.TvShowId == id)
-                                            .Select(e=>e.Episodes)
-                                            .CountAsync();
-                /*count = await _context.Episodes.AsNoTracking()
-                                        .Include(e => e.Season  )
-                                        .Where(e=> e.SeasonId in _context.Seasons.Where(s=>s.TvShowId == id))
-                                        .CountAsync();*/
-                return await _context.Seasons
-                                .AsNoTracking()
-                                .Where(e=>e.TvShowId == id)
-                                .Select(e=>e.Episodes)
-                                .Skip(skip)
-                                .Take(take)
-                                //.Select(s => _mapper.Map<EpisodeDTO>(s))
-                                .PaginateAsync((skip / take) + 1, take, count);
+                int count = await _context.Episodes.AsNoTracking()
+                                        .Where(s => s.Season.TvShowId == id)
+                                        .CountAsync();
+                return await _context.Episodes.AsNoTracking()
+                                     .Where(s => s.Season.TvShowId == id)
+                                     .Skip(skip)
+                                     .Take(take)
+                                    .PaginateAsync((skip / take) + 1, take, count, sort);
             }
             catch
             {

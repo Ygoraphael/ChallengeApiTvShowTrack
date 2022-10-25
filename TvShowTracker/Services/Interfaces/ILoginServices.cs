@@ -3,6 +3,6 @@ namespace TvShowTracker.Interfaces
 {
     public interface ILoginServices
     {
-        string Login(UserPostDTO userLogin);
+        Task<string> Login(UserPostDTO userLogin);
     }
 }

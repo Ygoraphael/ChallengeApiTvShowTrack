@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using TvShowTracker.EntityFrameworkPaginateCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using TvShowTracker.Interfaces;
+using System.Security.Claims;
 using TvShowTracker.Model;
+
 namespace TvShowTracker.Controller
 {
     [Route("v1/[controller]")]
@@ -20,7 +22,7 @@ namespace TvShowTracker.Controller
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetFavoriteTvShow(
+        public async Task<ActionResult<Page<TvShow>>> GetFavoriteTvShow(
              [FromQuery(Name = "$page")] int skip,
              [FromQuery(Name = "$pagesize")] int take,
              [FromQuery(Name = "$sortby")] string? sort)
@@ -54,7 +56,7 @@ namespace TvShowTracker.Controller
             try
             {
                 await _favoriteServices.AddFavoriteIfDoesntExist(id, tvShow.TvShowId);
-                return CreatedAtAction("GetFavoriteTvShow", null);
+                return CreatedAtAction("GetFavoriteTvShow", "success");
             }
             catch (Exception e)
             {

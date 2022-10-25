@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using TvShowTracker.EntityFrameworkPaginateCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TvShowTracker.EntityFrameworkPaginateCore;
 using TvShowTracker.Interfaces;
 using TvShowTracker.Model;
 

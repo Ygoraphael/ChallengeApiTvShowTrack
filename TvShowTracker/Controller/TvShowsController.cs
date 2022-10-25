@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using TvShowTracker.EntityFrameworkPaginateCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TvShowTracker.EntityFrameworkPaginateCore;
 using TvShowTracker.Interfaces;
 using TvShowTracker.Model;
+
 namespace TvShowTracker.Controller
 {
     [Route("v1/[controller]")]
@@ -97,7 +98,7 @@ namespace TvShowTracker.Controller
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetEpisodesTvShow(
+        public async Task<ActionResult<Page<Episode>>> GetEpisodesTvShow(
               int id,
              [FromQuery(Name = "$page")] int skip,
              [FromQuery(Name = "$pagesize")] int take,

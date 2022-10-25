@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TvShowTracker.Interfaces;
 using TvShowTracker.Model;
+
 namespace TvShowTracker.Controller
 {
     [Route("v1/[controller]")]
@@ -18,7 +19,7 @@ namespace TvShowTracker.Controller
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetUserById(int id)
+        public async Task<ActionResult<User>> GetUserById(int id)
         {
             if (id == 0) return BadRequest();
             try
