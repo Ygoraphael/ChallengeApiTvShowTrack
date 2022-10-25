@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using TvShowTracker.Config.LoadDataApi.Repository;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using TvShowTracker.Config.LoadDataApi;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +12,6 @@ using TvShowTracker.Config;
 using TvShowTracker.Data;
 using AutoMapper;
 using Hangfire;
-using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace TvShowTracker.Startup
 {

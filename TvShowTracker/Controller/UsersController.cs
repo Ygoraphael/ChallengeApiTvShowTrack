@@ -6,6 +6,7 @@ namespace TvShowTracker.Controller
 {
     [Route("v1/[controller]")]
     [ApiController]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     public class UsersController : ControllerBase
     {
         private readonly IUserServices _repUser;
@@ -19,7 +20,7 @@ namespace TvShowTracker.Controller
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<User>> GetUserById(int id)
+        public async Task<ActionResult<UserGetDTO>> GetUserById(int id)
         {
             if (id == 0) return BadRequest();
             try
