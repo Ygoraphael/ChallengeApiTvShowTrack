@@ -1,6 +1,5 @@
 # How to Load the App
 ```
-git clone https://github.com/oliver-gomes/react-movie.git
 npm install
 npm start
 ```
