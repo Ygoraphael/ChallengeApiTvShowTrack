@@ -18,7 +18,7 @@ namespace TvShowTracker.Config.LoadDataApi.Repository
         {
             try
             {
-                _connection.Execute(QueryInsert.InsertGenre, genres);
+                await _connection.ExecuteAsync(QueryInsert.InsertGenre, genres);
             }
             catch (Exception e)
             {
@@ -29,7 +29,7 @@ namespace TvShowTracker.Config.LoadDataApi.Repository
         {
             try
             {
-                _connection.Execute(QueryInsert.InsertTvShow, tvShows);
+                await _connection.ExecuteAsync(QueryInsert.InsertTvShow, tvShows);
             }
             catch (Exception e)
             {
@@ -40,7 +40,7 @@ namespace TvShowTracker.Config.LoadDataApi.Repository
         {
             try
             {
-                _connection.Execute(QueryInsert.InsertSeason, seasons);
+                await _connection.ExecuteAsync(QueryInsert.InsertSeason, seasons);
             }
             catch (Exception e)
             {
@@ -51,7 +51,7 @@ namespace TvShowTracker.Config.LoadDataApi.Repository
         {
             try
             {
-                _connection.Execute(QueryInsert.InsertEpisode, episodes);
+                await _connection.ExecuteAsync(QueryInsert.InsertEpisode, episodes);
             }
             catch (Exception e)
             {
@@ -62,7 +62,7 @@ namespace TvShowTracker.Config.LoadDataApi.Repository
         {
             try
             {
-                _connection.Execute(QueryInsert.InsertActor, actors);
+                await _connection.ExecuteAsync(QueryInsert.InsertActor, actors);
             }
             catch (Exception e)
             {
@@ -73,7 +73,7 @@ namespace TvShowTracker.Config.LoadDataApi.Repository
         {
             try
             {
-                _connection.Execute(QueryInsert.InsertTvShowGenres, tvShowGenres);
+                await _connection.ExecuteAsync(QueryInsert.InsertTvShowGenres, tvShowGenres);
             }
             catch (Exception e)
             {
@@ -84,7 +84,7 @@ namespace TvShowTracker.Config.LoadDataApi.Repository
         {
             try
             {
-                _connection.Execute(QueryInsert.InsertEpisodesActors, episodeActors);
+                await _connection.ExecuteAsync(QueryInsert.InsertEpisodesActors, episodeActors);
 
             }
             catch (Exception e)
